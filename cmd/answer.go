@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
@@ -21,10 +21,10 @@ func newAnswerCmd() *cobra.Command {
 		Short: "Get a direct answer to a question with citations",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := clientFromContext(cmd)
+			c := clientFromContext(cmd)
 			query := joinArgs(args)
 
-			req := exa.AnswerRequest{
+			req := client.AnswerRequest{
 				Query: query,
 			}
 			if model != "" {
@@ -41,7 +41,7 @@ func newAnswerCmd() *cobra.Command {
 				req.Text = &t
 			}
 
-			resp, err := client.Answer(req)
+			resp, err := c.Answer(req)
 			if err != nil {
 				return fmt.Errorf("answer failed: %w", err)
 			}

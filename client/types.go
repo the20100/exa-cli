@@ -1,4 +1,4 @@
-package exa
+package client
 
 // --- Request types ---
 

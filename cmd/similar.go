@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
@@ -28,9 +28,9 @@ func newFindSimilarCmd() *cobra.Command {
 		Short: "Find pages similar to a URL",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := clientFromContext(cmd)
+			c := clientFromContext(cmd)
 
-			req := exa.FindSimilarRequest{
+			req := client.FindSimilarRequest{
 				URL:                 args[0],
 				ExcludeSourceDomain: excludeSourceDomain,
 				IncludeDomains:      includeDomains,
@@ -51,7 +51,7 @@ func newFindSimilarCmd() *cobra.Command {
 				req.Contents = contents
 			}
 
-			resp, err := client.FindSimilar(req)
+			resp, err := c.FindSimilar(req)
 			if err != nil {
 				return fmt.Errorf("find-similar failed: %w", err)
 			}

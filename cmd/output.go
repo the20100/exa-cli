@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 )
 
-func printResults(results []exa.Result, jsonOut bool) {
+func printResults(results []client.Result, jsonOut bool) {
 	if jsonOut {
 		b, _ := json.MarshalIndent(results, "", "  ")
 		fmt.Println(string(b))
@@ -48,7 +48,7 @@ func printResults(results []exa.Result, jsonOut bool) {
 	}
 }
 
-func printAnswer(resp *exa.AnswerResponse, jsonOut bool) {
+func printAnswer(resp *client.AnswerResponse, jsonOut bool) {
 	if jsonOut {
 		b, _ := json.MarshalIndent(resp, "", "  ")
 		fmt.Println(string(b))

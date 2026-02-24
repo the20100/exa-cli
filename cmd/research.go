@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +16,14 @@ func newResearchCmd() *cobra.Command {
 		Short: "Run a deep research task",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := clientFromContext(cmd)
+			c := clientFromContext(cmd)
 			instructions := joinArgs(args)
 
-			req := exa.ResearchRequest{
+			req := client.ResearchRequest{
 				Instructions: instructions,
 			}
 
-			resp, err := client.Research(req)
+			resp, err := c.Research(req)
 			if err != nil {
 				return fmt.Errorf("research failed: %w", err)
 			}

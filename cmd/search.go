@@ -3,27 +3,27 @@ package cmd
 import (
 	"fmt"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
 func newSearchCmd() *cobra.Command {
 	var (
-		numResults    int
-		startDate     string
-		endDate       string
+		numResults     int
+		startDate      string
+		endDate        string
 		includeDomains []string
 		excludeDomains []string
-		includeText   []string
-		excludeText   []string
-		category      string
-		searchType    string
-		withText      bool
-		withSummary   bool
+		includeText    []string
+		excludeText    []string
+		category       string
+		searchType     string
+		withText       bool
+		withSummary    bool
 		withHighlights bool
-		livecrawl     string
-		maxAge        int
-		jsonOut       bool
+		livecrawl      string
+		maxAge         int
+		jsonOut        bool
 	)
 
 	cmd := &cobra.Command{
@@ -31,10 +31,10 @@ func newSearchCmd() *cobra.Command {
 		Short: "Search the web with Exa",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := clientFromContext(cmd)
+			c := clientFromContext(cmd)
 			query := joinArgs(args)
 
-			req := exa.SearchRequest{
+			req := client.SearchRequest{
 				Query:          query,
 				IncludeDomains: includeDomains,
 				ExcludeDomains: excludeDomains,
@@ -62,7 +62,7 @@ func newSearchCmd() *cobra.Command {
 				req.Contents = contents
 			}
 
-			resp, err := client.Search(req)
+			resp, err := c.Search(req)
 			if err != nil {
 				return fmt.Errorf("search failed: %w", err)
 			}

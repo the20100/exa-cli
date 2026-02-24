@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
@@ -38,8 +38,8 @@ Available commands:
 			if key == "" {
 				return fmt.Errorf("API key required: set EXA_API_KEY or use --api-key")
 			}
-			client := exa.NewClient(key, baseURL)
-			cmd.SetContext(contextWithClient(cmd.Context(), client))
+			c := client.NewClient(key, baseURL)
+			cmd.SetContext(contextWithClient(cmd.Context(), c))
 			return nil
 		},
 	}
@@ -65,25 +65,23 @@ func Execute() {
 	}
 }
 
-// helpers shared by commands
-
 func joinArgs(args []string) string {
 	return strings.Join(args, " ")
 }
 
-func buildContents(withText, withSummary, withHighlights bool, livecrawl string, maxAge int) *exa.ContentsOptions {
+func buildContents(withText, withSummary, withHighlights bool, livecrawl string, maxAge int) *client.ContentsOptions {
 	if !withText && !withSummary && !withHighlights && livecrawl == "" && maxAge == 0 {
 		return nil
 	}
-	c := &exa.ContentsOptions{}
+	c := &client.ContentsOptions{}
 	if withText {
-		c.Text = &exa.TextOptions{}
+		c.Text = &client.TextOptions{}
 	}
 	if withSummary {
-		c.Summary = &exa.SummaryOptions{}
+		c.Summary = &client.SummaryOptions{}
 	}
 	if withHighlights {
-		c.Highlights = &exa.HighlightOptions{}
+		c.Highlights = &client.HighlightOptions{}
 	}
 	if livecrawl != "" {
 		c.Livecrawl = &livecrawl

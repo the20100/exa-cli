@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"exa-cli/exa"
+	"exa-cli/client"
 	"github.com/spf13/cobra"
 )
 
@@ -22,24 +22,21 @@ func newGetContentsCmd() *cobra.Command {
 		Short: "Retrieve content from URLs",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client := clientFromContext(cmd)
+			c := clientFromContext(cmd)
 
-			req := exa.GetContentsRequest{
+			req := client.GetContentsRequest{
 				IDs: args,
 			}
 
 			contents := buildContents(withText, withSummary, withHighlights, livecrawl, maxAge)
 			if contents == nil {
-				// Default: include text
-				t := true
-				_ = t
-				contents = &exa.ContentsOptions{
-					Text: &exa.TextOptions{},
+				contents = &client.ContentsOptions{
+					Text: &client.TextOptions{},
 				}
 			}
 			req.Contents = contents
 
-			resp, err := client.GetContents(req)
+			resp, err := c.GetContents(req)
 			if err != nil {
 				return fmt.Errorf("get-contents failed: %w", err)
 			}
