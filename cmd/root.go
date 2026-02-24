@@ -7,7 +7,6 @@ import (
 
 	"exa-cli/exa"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const clientKey = "exa_client"
@@ -32,12 +31,9 @@ Available commands:
   answer        Get a direct AI answer with citations
   research      Run a deep research task`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			viper.SetEnvPrefix("EXA")
-			viper.AutomaticEnv()
-
 			key := apiKey
 			if key == "" {
-				key = viper.GetString("API_KEY")
+				key = os.Getenv("EXA_API_KEY")
 			}
 			if key == "" {
 				return fmt.Errorf("API key required: set EXA_API_KEY or use --api-key")
