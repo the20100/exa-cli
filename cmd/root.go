@@ -53,6 +53,7 @@ Available commands:
 		newGetContentsCmd(),
 		newAnswerCmd(),
 		newResearchCmd(),
+		newUpdateCmd(),
 	)
 
 	return root
