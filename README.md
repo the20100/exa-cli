@@ -5,7 +5,7 @@ A Go command-line interface for the [Exa AI](https://exa.ai) search API — neur
 ## Installation
 
 ```bash
-git clone <repo>
+git clone https://github.com/the20100/exa-cli
 cd exa-cli
 go build -o ~/bin/exa .
 ```
@@ -206,6 +206,18 @@ exa research "Top Go web frameworks with pros and cons" --json
 
 ---
 
+### `update` — Self-update
+
+Pull the latest source from GitHub, rebuild, and replace the current binary.
+
+```bash
+exa update
+```
+
+Requires `git` and `go` to be installed.
+
+---
+
 ## Global flags
 
 These flags apply to every command:
@@ -244,7 +256,8 @@ exa-cli/
     ├── similar.go     # exa find-similar
     ├── contents.go    # exa get-contents
     ├── answer.go      # exa answer
-    └── research.go    # exa research
+    ├── research.go    # exa research
+    └── update.go      # exa update (self-update)
 ```
 
 ---
