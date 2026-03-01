@@ -11,6 +11,16 @@ import (
 
 const clientKey = "exa_client"
 
+// resolveEnv returns the value of the first non-empty environment variable from the given names.
+func resolveEnv(names ...string) string {
+	for _, name := range names {
+		if v := os.Getenv(name); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
 func NewRootCmd() *cobra.Command {
 	var (
 		apiKey  string
@@ -22,7 +32,8 @@ func NewRootCmd() *cobra.Command {
 		Short: "Exa AI search CLI",
 		Long: `exa is a command-line interface for the Exa AI search API.
 
-Set your API key via the EXA_API_KEY environment variable or --api-key flag.
+Set your API key via the EXA_API_KEY environment variable (or aliases:
+EXA_KEY, EXA_API, API_KEY_EXA, ...) or --api-key flag.
 
 Available commands:
   search        Search the web
@@ -33,7 +44,10 @@ Available commands:
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			key := apiKey
 			if key == "" {
-				key = os.Getenv("EXA_API_KEY")
+				key = resolveEnv(
+					"EXA_API_KEY", "EXA_KEY", "EXA_API", "API_KEY_EXA", "API_EXA", "EXA_PK", "EXA_PUBLIC",
+					"EXA_API_SECRET", "EXA_SECRET_KEY", "EXA_API_SECRET_KEY", "EXA_SECRET", "SECRET_EXA", "API_SECRET_EXA", "SK_EXA", "EXA_SK",
+				)
 			}
 			if key == "" {
 				return fmt.Errorf("API key required: set EXA_API_KEY or use --api-key")
