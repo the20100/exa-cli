@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"exa-cli/client"
+	"exa-cli/internal/config"
+
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +23,21 @@ func resolveEnv(names ...string) string {
 	return ""
 }
 
+// isAuthCommand returns true if cmd is a child of the "auth" command.
+func isAuthCommand(cmd *cobra.Command) bool {
+	if cmd.Name() == "auth" {
+		return true
+	}
+	p := cmd.Parent()
+	for p != nil {
+		if p.Name() == "auth" {
+			return true
+		}
+		p = p.Parent()
+	}
+	return false
+}
+
 func NewRootCmd() *cobra.Command {
 	var (
 		apiKey  string
@@ -32,8 +49,10 @@ func NewRootCmd() *cobra.Command {
 		Short: "Exa AI search CLI",
 		Long: `exa is a command-line interface for the Exa AI search API.
 
-Set your API key via the EXA_API_KEY environment variable (or aliases:
-EXA_KEY, EXA_API, API_KEY_EXA, ...) or --api-key flag.
+Token resolution order:
+  1. EXA_API_KEY env var (or aliases: EXA_KEY, EXA_API, ...)
+  2. Config file (~/.config/exa/config.json via: exa auth set-key)
+  3. --api-key flag
 
 Available commands:
   search        Search the web
@@ -42,6 +61,10 @@ Available commands:
   answer        Get a direct AI answer with citations
   research      Run a deep research task`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if isAuthCommand(cmd) {
+				return nil
+			}
+
 			key := apiKey
 			if key == "" {
 				key = resolveEnv(
@@ -50,12 +73,22 @@ Available commands:
 				)
 			}
 			if key == "" {
-				return fmt.Errorf("API key required: set EXA_API_KEY or use --api-key")
+				cfg, err := config.Load()
+				if err != nil {
+					return fmt.Errorf("failed to load config: %w", err)
+				}
+				if cfg.APIKey != "" {
+					key = cfg.APIKey
+				}
+			}
+			if key == "" {
+				return fmt.Errorf("not authenticated — run: exa auth set-key\nor set EXA_API_KEY env var")
 			}
 			c := client.NewClient(key, baseURL)
 			cmd.SetContext(contextWithClient(cmd.Context(), c))
 			return nil
 		},
+		SilenceUsage: true,
 	}
 
 	root.PersistentFlags().StringVar(&apiKey, "api-key", "", "Exa API key (or set EXA_API_KEY)")
@@ -68,6 +101,7 @@ Available commands:
 		newAnswerCmd(),
 		newResearchCmd(),
 		newUpdateCmd(),
+		newAuthCmd(),
 	)
 
 	return root
